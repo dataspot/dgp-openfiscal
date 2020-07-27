@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  server:
+    build: .
+    restart: always
+    environment:
+      EXTERNAL_ADDRESS: https://upload.openfiscal.org
+      BUCKET_NAME: data.openfiscal.org
+      S3_ENDPOINT_URL: https://storage.googleapis.com
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      AWS_REGION:
+      GOOGLE_KEY:
+      GOOGLE_SECRET:
+      DATABASE_URL:
+      DATASETS_DATABASE_URL:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN:
+      ETLS_DATABASE_URL:
+      PUBLIC_KEY:
+      PRIVATE_KEY:
+    expose:
+      - 5000
+    ports:
+      - 80:5000
