@@ -1,0 +1,13 @@
+_common_:
+  title: _common_
+  publishing_module: publish.py
+fiscal:
+  title: Generic Fiscal
+  column_types: fiscal/column_types.json
+  processing_module: fiscal/process.py
+  config:
+    missingValues:
+      - '-'
+mexico:
+  title: Mèxico
+  processing_module: mexico/process.py
