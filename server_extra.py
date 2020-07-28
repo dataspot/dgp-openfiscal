@@ -1,18 +1,22 @@
+import os
 import logging
 
 from flask import Blueprint, current_app, abort
 from flask_jsonpify import jsonify
+
+from sqlalchemy import create_engine
 
 from babbage import CubeManager
 from babbage.api import configure_api
 
 from taxonomies.babbage_models import babbage_models
 
-
 class CustomCubeManager(CubeManager):
 
     def __init__(self):
-        super().__init__(None)
+        db_connection_string = os.environ['DATASETS_DATABASE_URL']
+        engine = create_engine(db_connection_string)
+        super().__init__(engine)
 
     def list_cubes(self):
         """ List all available models in the DB """
