@@ -17,7 +17,7 @@ class CustomCubeManager(CubeManager):
     def list_cubes(self):
         """ List all available models in the DB """
         for instance in babbage_models.query()['result']:
-            yield instance['value']
+            yield instance['key']
 
     def has_cube(self, name):
         """ Check if a cube exists. """
