@@ -130,6 +130,7 @@ class OSPublisherDGP(BaseEnricher):
     def normalize(self, package, full_name, db_table):
         schema = package.descriptor['resources'][0]['schema']
         fields = schema['fields']
+        print(json.dumps(fields, indent=2))
         primary_key = schema['primaryKey']
         mapping = []
         for f in fields:
