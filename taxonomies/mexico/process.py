@@ -92,6 +92,9 @@ COLUMN_MAPPING = dict([
 
 
 def objeto_del_gasto(config):
+
+    print('PREPARING objeto_del_gasto processing')
+
     CT = COLUMN_MAPPING
     CN = dict(
         (k, v.replace(':', '-'))
@@ -158,9 +161,3 @@ def flows(config, context):
         flows[1],
         objeto_del_gasto(config),
     )
-
-
-# def analyzers(*_):
-#     return [
-#         MissingColumns
-#     ]
