@@ -1,4 +1,5 @@
 import os
+import copy
 
 from sqlalchemy import create_engine
 
@@ -125,24 +126,18 @@ class OSPublisherDGP(BaseEnricher):
             if item['name'] == ct:
                 return item.get('dataType', 'string')
 
-    def postflow(self):
-        steps = []
-        logger.info('Publisher Flow Preparing')
-
-        full_name = '{}_{}'.format(
-            self.config.get(CONFIG_TAXONOMY_ID),
-            slugify(self.config.get(CONFIG_EXTRA_METADATA_DATASET_NAME), separator='_', lowercase=True),
-        )
-        db_table = 'dgp__{}'.format(full_name)
-        logger.info('Publisher Flow: Dump To DB... (%s)', db_table)
-        primary_key = self.config.get(CONFIG_PRIMARY_KEY)
-        mapping = self.config.get(CONFIG_MODEL_MAPPING)
-        for m in mapping:
+    def normalize(self, package, full_name, db_table):
+        schema = package.descriptor['resources'][0]['schema']
+        fields = schema['fields']
+        primary_key = schema['primaryKey']
+        mapping = []
+        for f in fields:
+            m = copy.deepcopy(f) 
             if m.get('columnType'):
                 m['slug'] = self.slugify(m['title'])
                 m['hierarchy'] = self.slugify(m['columnType'].split(':')[0])
                 m['column'] = self.column(m['columnType'])
-                m['primaryKey'] = m['columnType'] in primary_key
+                m['primaryKey'] = m['name'] in primary_key
                 m['measure'] = m['hierarchy'] == 'value'
                 m['full_column'] = (
                     m['column'] if m['measure']
@@ -150,6 +145,7 @@ class OSPublisherDGP(BaseEnricher):
                 )
                 m['label'] = self.fetch_label(m['columnType'])
                 m['dataType'] = self.fetch_datatype(m['columnType'])
+                mapping.append(m)
         prefixes = set(
             m['hierarchy']
             for m in mapping
@@ -193,7 +189,7 @@ class OSPublisherDGP(BaseEnricher):
                         label_attribute=m['label']['slug']
                     ) if m.get('label') else {})
                 ))
-                for m in self.config.get(CONFIG_MODEL_MAPPING)
+                for m in mapping
                 if m.get('measure') is False and m.get('primaryKey') is True
             ),
             fact_table=db_table,
@@ -206,7 +202,7 @@ class OSPublisherDGP(BaseEnricher):
                         type='number'
                     )
                 )
-                for m in self.config.get(CONFIG_MODEL_MAPPING)
+                for m in mapping
                 if m.get('measure') is True
             ),
             hierarchies=dict(
@@ -221,18 +217,9 @@ class OSPublisherDGP(BaseEnricher):
                 for prefix, prefixed_items in prefixed.items()
             ),
         )
-        steps.append(
+
+        return Flow(
             update_package(babbage_model=babbage_model)
-        )
-        source = get_source(self.config)
-        logger.info('Publisher Flow: _source Handling...')
-        steps.extend([
-            add_field('_source', 'string', source),
-            append_to_primary_key('_source'),
-            clear_by_source(engine, db_table, source),
-        ])
-        logger.info('Publisher Flow: Normalize...')
-        steps.extend([
             normalize_to_db(
                 groups,
                 db_table,
@@ -240,12 +227,26 @@ class OSPublisherDGP(BaseEnricher):
                 db_connection_string,
                 'append'
             ),
+            finalizer(lambda: babbage_models.create_or_edit(full_name, babbage_model))
+        )
+
+    def postflow(self):
+        steps = []
+        logger.info('Publisher Flow Preparing')
+
+        full_name = '{}_{}'.format(
+            self.config.get(CONFIG_TAXONOMY_ID),
+            slugify(self.config.get(CONFIG_EXTRA_METADATA_DATASET_NAME), separator='_', lowercase=True),
+        )
+        db_table = 'dgp__{}'.format(full_name)
+        source = get_source(self.config)
+        steps.extend([
+            add_field('_source', 'string', source),
+            append_to_primary_key('_source'),
+            clear_by_source(engine, db_table, source),
+            conditional(lambda pkg: True, lambda pkg: self.normalize_to_db(pkg, full_name, db_table)),
         ])
 
-        def save_babbage_model():
-             babbage_models.create_or_edit(full_name, babbage_model)
-
-        steps.append(finalizer(save_babbage_model))
         logger.info('Publisher Flow Prepared')
         return Flow(*steps)
 
