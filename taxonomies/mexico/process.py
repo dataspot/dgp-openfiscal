@@ -146,7 +146,7 @@ def objeto_del_gasto(config):
                 add_field(CN[f], 'string', columnType=ct),
                 append_to_primary_key(CN[f]) if 'ID_' in f else None
             ))
-            for f, ct in CN.items()
+            for f, ct in CT.items()
         ],
         process
     )

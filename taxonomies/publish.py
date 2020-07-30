@@ -54,7 +54,10 @@ class MissingColumnsAdder(BaseEnricher):
 
     def no_such_field(self, field_name):
         def func(dp):
-            return all(field_name != f.name for f in dp.resources[0].schema.fields)
+            ret = all(field_name != f.name for f in dp.resources[0].schema.fields)
+            if ret:
+                print('Adding missing field for {}'.format(field_name))
+            return ret
         return func
 
     def postflow(self):
@@ -65,12 +68,12 @@ class MissingColumnsAdder(BaseEnricher):
             unique = ct.get('unique')
             if unique:
                 flow = Flow(
-                    add_field(name, dataType, '-', resources=RESOURCE_NAME),
+                    add_field(name, dataType, '-', resources=RESOURCE_NAME, columnType=ct['name']),
                     append_to_primary_key(name)
                 )
             else:
                 flow = Flow(
-                    add_field(name, dataType, None, resources=RESOURCE_NAME),
+                    add_field(name, dataType, None, resources=RESOURCE_NAME, columnType=ct['name']),
                 )
             steps.append(
                 conditional(
