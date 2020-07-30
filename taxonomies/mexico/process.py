@@ -153,10 +153,10 @@ def objeto_del_gasto(config):
                 (ct['name'], i)
                 for i, ct in enumerate(config.get(CONFIG_TAXONOMY_CT)) 
             )
-            fields = sorted(
+            fields = sorted((
                 (ct_indexes.get(f.get('columnType'), 1000), f)
                 for f in package.pkg.descriptor['resources'][0]['schema']['fields']
-            )
+            ), key=lambda x: x[0])
             package.pkg.descriptor['resources'][0]['schema']['fields'] = [
                 f[1] for f in fields
             ]
