@@ -1,4 +1,5 @@
 import os
+import logging
 
 import datapackage
 from dataflows import Flow, conditional, add_field 
@@ -93,7 +94,7 @@ COLUMN_MAPPING = dict([
 
 def objeto_del_gasto(config):
 
-    print('PREPARING objeto_del_gasto processing')
+    logging.info('PREPARING objeto_del_gasto processing')
 
     CT = COLUMN_MAPPING
     CN = dict(

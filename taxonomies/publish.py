@@ -56,8 +56,7 @@ class MissingColumnsAdder(BaseEnricher):
         def func(dp):
             ret = all(field_name != f.name for f in dp.resources[0].schema.fields)
             if ret:
-                print('Adding missing field for {}'.format(field_name))
-                print(json.dumps(dp.descriptor, indent=2))
+                logger.info('Adding missing field for {}'.format(field_name))
             return ret
         return func
 
@@ -134,7 +133,6 @@ class OSPublisherDGP(BaseEnricher):
     def normalize(self, package, full_name, db_table):
         schema = package.descriptor['resources'][0]['schema']
         fields = schema['fields']
-        print(json.dumps(fields, indent=2))
         primary_key = schema['primaryKey']
         mapping = []
         for f in fields:
@@ -161,7 +159,6 @@ class OSPublisherDGP(BaseEnricher):
             (p, list(filter(lambda m: m.get('hierarchy') == p, mapping)))
             for p in prefixes
         )
-        print(json.dumps(prefixed, indent=2))
         groups = [
             NormGroup([
                     m['column']
