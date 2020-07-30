@@ -1,4 +1,4 @@
-from dataflows import Flow, update_package
+from dataflows import Flow, update_package, conditional
 
 from dgp.core.base_enricher import enrichments_flows, BaseEnricher
 from dgp.config.consts import RESOURCE_NAME, CONFIG_PRIMARY_KEY
@@ -23,15 +23,10 @@ class Deduplicator(BaseEnricher):
     def test(self):
         return True
 
-    def postflow(self):
-        key_field_names = [
-            ct.replace(':', '-')
-            for ct in self.config.get(CONFIG_PRIMARY_KEY)
-        ]
-        used = set()
-
-        def dedup(rows):
+    def dedup(self, pkg):
+        def func(rows):
             if rows.res.name == RESOURCE_NAME:
+                key_field_names = rows.res.descriptor['schema']['primaryKey']
                 logger.info('DEDPULICATING with KEYS %r', key_field_names)
                 for row in rows:
                     key = tuple(row.get(k) for k in key_field_names)
@@ -41,9 +36,11 @@ class Deduplicator(BaseEnricher):
             else:
                 yield from rows
 
+
+    def postflow(self):
         steps = [
-            # conditional(lambda dp: self.config.get('extra.deduplicate'), dedup)
-            dedup,
+            conditional(lambda pkg: True,
+                        lambda pkg: self.dedup(pkg)),
         ]
         f = Flow(*steps)
         return f
