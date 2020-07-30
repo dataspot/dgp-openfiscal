@@ -14,7 +14,7 @@ from dgp.config.log import logger
 from dgp.config.consts import (
     CONFIG_URL,
     CONFIG_TAXONOMY_CT, CONFIG_TAXONOMY_ID,
-    CONFIG_MODEL_MAPPING, CONFIG_PRIMARY_KEY,
+    CONFIG_PRIMARY_KEY,
     RESOURCE_NAME
 )
 
@@ -109,7 +109,7 @@ class OSPublisherDGP(BaseEnricher):
     def column(self, x):
         return x.replace(':', '-')
 
-    def fetch_label(self, code_ct):
+    def fetch_label(self, code_ct, mapping):
         label_ct = None
         for ct in self.config.get(CONFIG_TAXONOMY_CT):
             if ct.get('labelOf'):
@@ -117,7 +117,7 @@ class OSPublisherDGP(BaseEnricher):
                     label_ct = ct['name']
                     break
         if label_ct is not None:
-            for m in self.config.get(CONFIG_MODEL_MAPPING):
+            for m in mapping:
                 if m.get('columnType') == label_ct:
                     return m
 
@@ -143,7 +143,7 @@ class OSPublisherDGP(BaseEnricher):
                     m['column'] if m['measure']
                     else '{}_{hierarchy}.{column}'.format(db_table, **m)
                 )
-                m['label'] = self.fetch_label(m['columnType'])
+                m['label'] = self.fetch_label(m['columnType'], mapping)
                 m['dataType'] = self.fetch_datatype(m['columnType'])
                 mapping.append(m)
         prefixes = set(
