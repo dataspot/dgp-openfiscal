@@ -73,7 +73,7 @@ class MissingColumnsAdder(BaseEnricher):
                 )
             else:
                 flow = Flow(
-                    add_field(name, dataType, None, resources=RESOURCE_NAME, columnType=ct['name']), title=ct['title'],
+                    add_field(name, dataType, None, resources=RESOURCE_NAME, columnType=ct['name'], title=ct['title']),
                 )
             steps.append(
                 conditional(
