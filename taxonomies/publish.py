@@ -57,6 +57,7 @@ class MissingColumnsAdder(BaseEnricher):
             ret = all(field_name != f.name for f in dp.resources[0].schema.fields)
             if ret:
                 print('Adding missing field for {}'.format(field_name))
+                print(json.dumps(dp.descriptor, indent=2))
             return ret
         return func
 
