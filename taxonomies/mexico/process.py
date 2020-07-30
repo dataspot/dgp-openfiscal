@@ -117,8 +117,11 @@ def objeto_del_gasto(config):
     def process(row):
         year = int(row['date-fiscal-year'])
 
+        for k, v in CN.items():
+            row.setdefault(v, '-' if 'ID_' in k else None)
+
         # Skip the LAST year of the dataset (currently 2016) it has split columns already
-        if year < 2018:
+        if year < 2019:
             objeto = row[CN['ID_CONCEPTO']]
             if objeto:
                 row[CN['ID_CAPITULO']] = objeto[0] + '000'
@@ -144,6 +147,23 @@ def objeto_del_gasto(config):
             return all(f.name != f for f in dp.resources[0].schema.fields)
         return func
 
+    def sort_by_ct():
+        def func(package):
+            ct_indexes = dict(
+                (ct['name'], i)
+                for i, ct in enumerate(config.get(CONFIG_TAXONOMY_CT)) 
+            )
+            fields = sorted(
+                (ct_indexes.get(f.get('columnType'), 1000), f)
+                for f in package.pkg.descriptor['resources'][0]['schema']['fields']
+            )
+            package.pkg.descriptor['resources'][0]['schema']['fields'] = [
+                f[1] for f in fields
+            ]
+            yield package
+            yield from package
+        return func
+
     return Flow(
         *[
             conditional(missing_field(CN[f]), Flow(
@@ -152,6 +172,7 @@ def objeto_del_gasto(config):
             ))
             for f, ct in CT.items()
         ],
+        sort_by_ct(),
         process
     )
 
