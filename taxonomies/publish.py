@@ -219,7 +219,7 @@ class OSPublisherDGP(BaseEnricher):
         )
 
         return Flow(
-            update_package(babbage_model=babbage_model)
+            update_package(babbage_model=babbage_model),
             normalize_to_db(
                 groups,
                 db_table,
