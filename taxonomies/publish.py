@@ -244,7 +244,7 @@ class OSPublisherDGP(BaseEnricher):
             add_field('_source', 'string', source),
             append_to_primary_key('_source'),
             clear_by_source(engine, db_table, source),
-            conditional(lambda pkg: True, lambda pkg: self.normalize_to_db(pkg, full_name, db_table)),
+            conditional(lambda pkg: True, lambda pkg: self.normalize(pkg, full_name, db_table)),
         ])
 
         logger.info('Publisher Flow Prepared')
