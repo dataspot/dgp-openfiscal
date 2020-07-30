@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 
 from slugify import slugify
 
-from dataflows import Flow, add_field, conditional, validate, schema_validator, update_package, finalizer
+from dataflows import Flow, add_field, conditional, validate, schema_validator, update_package, finalizer, update_stats
 from dataflows_normalize import normalize_to_db, NormGroup 
 
 from dgp.core.base_enricher import enrichments_flows, BaseEnricher
@@ -249,6 +249,7 @@ class OSPublisherDGP(BaseEnricher):
             append_to_primary_key('_source'),
             clear_by_source(engine, db_table, source),
             conditional(lambda pkg: True, lambda pkg: self.normalize(pkg, full_name, db_table)),
+            update_stats(dict(view_url='https://api.openfiscal.org/api/3/cubes/{}/model'.format(full_name))),
         ])
 
         logger.info('Publisher Flow Prepared')
