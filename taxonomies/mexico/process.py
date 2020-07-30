@@ -160,7 +160,7 @@ def objeto_del_gasto(config):
             package.pkg.descriptor['resources'][0]['schema']['fields'] = [
                 f[1] for f in fields
             ]
-            yield package
+            yield package.pkg
             yield from package
         return func
 
