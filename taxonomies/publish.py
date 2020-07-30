@@ -1,5 +1,6 @@
 import os
 import copy
+import json
 
 from sqlalchemy import create_engine
 
@@ -155,6 +156,7 @@ class OSPublisherDGP(BaseEnricher):
             (p, list(filter(lambda m: m.get('hierarchy') == p, mapping)))
             for p in prefixes
         )
+        print(json.dumps(prefixed, indent=2))
         groups = [
             NormGroup([
                     m['column']
