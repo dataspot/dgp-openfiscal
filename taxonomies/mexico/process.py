@@ -180,6 +180,6 @@ def objeto_del_gasto(config):
 def flows(config, context):
     flows = p_flows(config, context)
     return flows[0], Flow(
-        flows[1],
         objeto_del_gasto(config),
+        flows[1],
     )
