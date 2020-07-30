@@ -117,13 +117,10 @@ def objeto_del_gasto(config):
     def process(row):
         year = int(row['date-fiscal-year'])
 
-        for k, v in CN.items():
-            row.setdefault(v, '-' if 'ID_' in k else None)
-
         # Skip the LAST year of the dataset (currently 2016) it has split columns already
         if year < 2019:
             objeto = row[CN['ID_CONCEPTO']]
-            if objeto:
+            if objeto and objeto != '-':
                 row[CN['ID_CAPITULO']] = objeto[0] + '000'
                 row[CN['ID_CONCEPTO']] = objeto[:2] + '00'
                 row[CN['DESC_CAPITULO']] = lookup['capitulo'].get(row[CN['ID_CAPITULO']])
@@ -142,9 +139,9 @@ def objeto_del_gasto(config):
                     row[CN['DESC_PARTIDA_ESPECIFICA']] = \
                         lookup['partida_específica'].get(row.get(CN['ID_PARTIDA_ESPECIFICA']))
 
-    def missing_field(f):
+    def missing_field(mf):
         def func(dp):
-            return all(f.name != f for f in dp.resources[0].schema.fields)
+            return all(f.name != mf for f in dp.resources[0].schema.fields)
         return func
 
     def sort_by_ct():

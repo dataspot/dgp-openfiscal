@@ -26,6 +26,7 @@ class Deduplicator(BaseEnricher):
     def dedup(self, pkg):
         def func(rows):
             if rows.res.name == RESOURCE_NAME:
+                used = set()
                 key_field_names = rows.res.descriptor['schema']['primaryKey']
                 logger.info('DEDPULICATING with KEYS %r', key_field_names)
                 for row in rows:
@@ -35,6 +36,7 @@ class Deduplicator(BaseEnricher):
                         yield row
             else:
                 yield from rows
+        return Flow(func)
 
 
     def postflow(self):
