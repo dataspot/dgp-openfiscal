@@ -138,15 +138,15 @@ def objeto_del_gasto(config):
                     row[CN['DESC_PARTIDA_ESPECIFICA']] = \
                         lookup['partida_específica'].get(row.get(CN['ID_PARTIDA_ESPECIFICA']))
 
-    def has_field(f):
+    def missing_field(f):
         def func(dp):
-            return any(f.name == f for f in dp.resources[0].schema.fields)
+            return all(f.name != f for f in dp.resources[0].schema.fields)
         return func
 
     return Flow(
         *[
-            conditional(has_field(CN[f]), Flow(
-                add_field(CN[f], 'string', columnType=ct),
+            conditional(missing_field(CN[f]), Flow(
+                add_field(CN[f], 'string', columnType=ct, title=f),
                 append_to_primary_key(CN[f]) if 'ID_' in f else None
             ))
             for f, ct in CT.items()
