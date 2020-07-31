@@ -8,6 +8,7 @@ services:
       EXTERNAL_ADDRESS: https://upload.openfiscal.org
       BUCKET_NAME: data.openfiscal.org
       S3_ENDPOINT_URL: https://storage.googleapis.com
+      DGP_APP_DEFAULT_ROLE: 2
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
       AWS_REGION:
