@@ -12,6 +12,9 @@ RUN pip install -r requirements.txt
 COPY configuration.json dags/
 COPY logo.png ui/dist/ui/assets/logo.png
 COPY favicons/* ui/dist/ui/
+COPY os_entrypoint.sh .
 COPY server_extra.py .
 
 COPY taxonomies taxonomies
+
+ENTRYPOINT [ "/app/os_entrypoint.sh" ]

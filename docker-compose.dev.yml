@@ -88,3 +88,6 @@ services:
       - 5000:5000
     depends_on: 
       - db
+    # volumes: 
+    #   - /Users/adam/code/datariver/dgp/:/app/deps/dgp/
+  
