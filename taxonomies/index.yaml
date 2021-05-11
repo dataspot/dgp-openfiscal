@@ -11,5 +11,5 @@ fiscal:
 mexico:
   title: Mèxico
   processing_module: mexico/process.py
-openup:
-  title: OpenUp-SA Testing Taxonomy
+demo:
+  title: A Demo Taxonomy

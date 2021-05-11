@@ -3,7 +3,7 @@ version: "3"
 services:
 
   db:
-    build: ../../datariver/etl-server/db
+    image: akariv/dgp-app-db:latest
     ports:
       - 55432:5432
     expose:

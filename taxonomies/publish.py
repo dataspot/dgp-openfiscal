@@ -247,7 +247,7 @@ class OSPublisherDGP(BaseEnricher):
         steps.extend([
             add_field('_source', 'string', source),
             append_to_primary_key('_source'),
-            clear_by_source(engine, db_table, source),
+            clear_by_source(engine, db_table, source, '_source'),
             conditional(lambda pkg: True, lambda pkg: self.normalize(pkg, full_name, db_table)),
             update_stats(dict(view_url='https://api.openfiscal.org/api/3/cubes/{}/model'.format(full_name))),
         ])
